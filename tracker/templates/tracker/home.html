@@ -1,0 +1,38 @@
+{% extends "tracker/base.html" %}
+{% load static %}
+
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Welcome to the Tracker App</h1>
+    <p>This is a simple tracker application to manage your tasks and projects.</p>
+    <p>Use the navigation menu to explore different sections.</p>
+    <p>Current theme: <span id="current-theme">Light</span></p>
+    <button id="toggle-theme" class="btn btn-primary">Toggle Theme</button>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleButton = document.getElementById('toggle-theme');
+        const currentTheme = document.getElementById('current-theme');
+
+        toggleButton.addEventListener('click', function() {
+            if (document.documentElement.getAttribute('data-theme') === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                currentTheme.textContent = 'Light';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                currentTheme.textContent = 'Dark';
+            }
+        });
+    });
+</script>
+{% endblock content %} 
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'tracker/css/home.css' %}">
+{% endblock extra_css %}
+{% block extra_js %}
+<script src="{% static 'tracker/js/home.js' %}"></script>
+{% endblock extra_js %}
