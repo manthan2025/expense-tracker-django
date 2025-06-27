@@ -1,0 +1,26 @@
+<!-- filepath: /home/wadmin/Desktop/expense-tracker/tracker/templates/tracker/expense_dashboard.html -->
+{% extends "tracker/base.html" %}
+{% block title %}Expense Dashboard{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto mt-8">
+    <h2 class="text-2xl font-bold mb-4">Add Transaction</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Add</button>
+    </form>
+    <h3 class="text-xl font-bold mt-8 mb-2">Your Transactions</h3>
+    <ul>
+        {% for t in transactions %}
+            <li class="mb-2 p-2 bg-gray-800 rounded">
+                <span class="font-bold">{{ t.type|title }}</span> | 
+                ₹{{ t.amount }} | {{ t.category }} | {{ t.date }}<br>
+                <span class="text-gray-400">{{ t.description }}</span>
+            </li>
+        {% empty %}
+            <li>No transactions yet.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'home' %}" class="inline-block mb-4 bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600">🏠 Home</a>
+</div>
+{% endblock %}

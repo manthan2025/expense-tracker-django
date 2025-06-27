@@ -1,0 +1,23 @@
+{% extends "tracker/base.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto mt-10 bg-gray-900 p-8 rounded shadow">
+    <h2 class="text-2xl font-bold mb-4 text-center">Your Profile</h2>
+    {% if user.profile_picture %}
+        <div class="flex justify-center mb-4">
+            <img src="{{ user.profile_picture.url }}" alt="Profile Picture" class="w-32 h-32 rounded-full object-cover border-4 border-green-400 shadow">
+        </div>
+    {% endif %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="mt-6 text-center">
+            <a href="{% url 'profile_password_reset' %}" class="text-blue-400 underline">Reset Password</a>
+        </div>
+        <br>
+        <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Update</button>
+    </form>
+    <br>
+    <a href="{% url 'home' %}" class="inline-block mb-4 bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600">🏠 Home</a>
+</div>
+{% endblock %}

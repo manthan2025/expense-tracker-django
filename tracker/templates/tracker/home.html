@@ -5,28 +5,115 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1>Welcome to the Tracker App</h1>
-    <p>This is a simple tracker application to manage your tasks and projects.</p>
-    <p>Use the navigation menu to explore different sections.</p>
-    <p>Current theme: <span id="current-theme">Light</span></p>
-    <button id="toggle-theme" class="btn btn-primary">Toggle Theme</button>
+<div class="container mx-auto py-8">
+    <div class="flex justify-end space-x-4 mb-4">
+        {% if user.is_authenticated %}
+            <span class="text-green-400">Welcome, {{ user.username }}!</span>
+            <a href="{% url 'logout' %}" class="bg-red-500 text-white px-4 py-2 rounded">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="bg-blue-500 text-white px-4 py-2 rounded">Login</a>
+            <a href="{% url 'register' %}" class="bg-green-500 text-white px-4 py-2 rounded">Register</a>
+        {% endif %}
+    </div>
+    <h1 class="text-3xl font-bold mb-4 text-center">Welcome to the Expense Tracker App</h1>
+    <p class="mb-2 text-center">This is a Simple personal financial tracker cum manager App.</p>
+    <p class="mb-8 text-center">Use the navigation menu to explore different sections.</p>
+    <p class="text-center text-gray-400 mb-4">
+        Total registered users: <span class="font-bold text-green-400">{{ user_count }}</span>
+    </p>
+    {% if user.is_authenticated %}
+    <a href="{% url 'profile' %}" class="bg-yellow-500 text-white px-4 py-2 rounded">Profile</a>
+    <a href="{% url 'expense_dashboard' %}" class="bg-purple-500 text-white px-4 py-2 rounded mb-4 inline-block">Go to Expense Tracker</a>
+    {% endif %}
+    <!-- Carousel -->
+    <div id="carousel" class="relative w-full max-w-xl mx-auto rounded-lg overflow-hidden shadow-lg bg-gray-800">
+        <div id="carousel-slide" class="flex flex-col items-center justify-center h-64 p-6 transition-all duration-700">
+            <!-- Content will be injected by JS -->
+        </div>
+        <div class="absolute bottom-2 left-0 right-0 flex justify-center space-x-2" id="carousel-indicators">
+            <!-- Indicators will be injected by JS -->
+        </div>
+    </div>
 </div>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const toggleButton = document.getElementById('toggle-theme');
-        const currentTheme = document.getElementById('current-theme');
+const quotes = [
+    {
+        quote: "Do not save what is left after spending, but spend what is left after saving.",
+        author: "Warren Buffett",
+        image: "https://images.unsplash.com/photo-1515168833906-d2a3b82b1a5e?auto=format&fit=crop&w=600&q=80"
+    },
+    {
+        quote: "A budget is telling your money where to go instead of wondering where it went.",
+        author: "Dave Ramsey",
+        image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80"
+    },
+    {
+        quote: "Beware of little expenses; a small leak will sink a great ship.",
+        author: "Benjamin Franklin",
+        image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80"
+    },
+    {
+        quote: "The art is not in making money, but in keeping it.",
+        author: "Proverb",
+        image: "https://images.unsplash.com/photo-1523289333742-be1143f6b766?auto=format&fit=crop&w=600&q=80"
+    }
+];
 
-        toggleButton.addEventListener('click', function() {
-            if (document.documentElement.getAttribute('data-theme') === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'light');
-                currentTheme.textContent = 'Light';
-            } else {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                currentTheme.textContent = 'Dark';
-            }
+// Optionally, fetch more quotes from an API here and merge with the above
+
+let current = 0;
+const slide = document.getElementById('carousel-slide');
+const indicators = document.getElementById('carousel-indicators');
+
+function renderSlide(idx) {
+    const q = quotes[idx];
+    slide.innerHTML = `
+        <img src="${q.image}" alt="Finance" class="w-full h-40 object-cover rounded mb-4 shadow">
+        <blockquote class="text-lg italic text-white text-center mb-2">"${q.quote}"</blockquote>
+        <div class="text-right text-sm text-gray-300 w-full">- ${q.author}</div>
+    `;
+    renderIndicators(idx);
+}
+
+function renderIndicators(activeIdx) {
+    indicators.innerHTML = quotes.map((_, i) =>
+        `<button class="w-3 h-3 rounded-full ${i === activeIdx ? 'bg-green-400' : 'bg-gray-500'}" onclick="goToSlide(${i})"></button>`
+    ).join('');
+}
+
+window.goToSlide = function(idx) {
+    current = idx;
+    renderSlide(current);
+    resetInterval();
+};
+
+function nextSlide() {
+    current = (current + 1) % quotes.length;
+    renderSlide(current);
+}
+
+let interval = setInterval(nextSlide, 4000);
+
+function resetInterval() {
+    clearInterval(interval);
+    interval = setInterval(nextSlide, 4000);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    renderSlide(current);
+    fetch('https://api.quotable.io/quotes?tags=money|business|success')
+        .then(response => response.json())
+        .then(data => {
+            // data.results is an array of quote objects
+            // Each object: {content: "...", author: "..."}
+            quotes.push({
+                quote: data.results[0].content,
+                author: data.results[0].author,
+                image: "https://source.unsplash.com/600x400/?finance,money"
+            });
+            renderIndicators(current);
         });
-    });
+});
 </script>
 {% endblock content %} 
 
